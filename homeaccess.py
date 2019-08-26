@@ -13,6 +13,7 @@ def main():
     with requests.Session() as s:
         s.post(credentials.HOME_ACCESS_POST, data=credentials.INIT_PAYLOAD)
         r = s.get(credentials.HOME_ACCESS_REQUEST, params=credentials.INIT_PAYLOAD)
+
         if r.status_code != 200:
             print(r.status_code)
             print(r.reason)
@@ -52,8 +53,7 @@ def main():
             sys.exit(1)
 
         soup = BeautifulSoup(r.text, 'html.parser')
-        # note here that the elementary has a slightly different tag for the courses
-        courses = soup.findAll('span', {"class": "sg-font-larger"})
+        courses = soup.findAll('a', id='courseName')
         grades = soup.findAll('a', id='average')
 
         for i, (g, c) in enumerate(zip(grades, courses)):
