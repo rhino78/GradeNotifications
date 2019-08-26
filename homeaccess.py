@@ -6,6 +6,9 @@ from bs4 import BeautifulSoup
 
 def main():
 
+    # TODO: lot of redundant code here. Need to think about a method that returns the grade status
+    # TODO: send to each individual kid so they are aware
+
     t_grades = dict()
     l_grades = dict()
     b_grades = dict()
