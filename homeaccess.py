@@ -5,10 +5,8 @@ from bs4 import BeautifulSoup
 
 
 def main():
-    t_grades = dict()
-    l_grades = dict()
-    b_grades = dict()
 
+    all_grades = []
     with requests.Session() as s:
         s.post(credentials.HOME_ACCESS_POST, data=credentials.INIT_PAYLOAD)
         r = s.get(credentials.HOME_ACCESS_REQUEST, params=credentials.INIT_PAYLOAD)
@@ -19,16 +17,8 @@ def main():
             print('initial get failed')
             sys.exit(1)
 
-        courses, grades = getcoursegrades(r)
-
-        for i, (g, c) in enumerate(zip(grades, courses)):
-            l_grades[c.text] = g.text
-
-        all_grades = '-----Luisa-----\r\n'
-        for l in l_grades.keys():
-            all_grades += "{} | {}\r\n".format(l, l_grades[l])
-
-        notif.send_notification(all_grades, notif.kids.middle)
+        middle = notif.kids_class(notif.kids.middle.value, getGrades(r), credentials.SEND_MIDDLE_EMAIL)
+        all_grades.append(middle)
 
         # switch kid profile
         s.post(credentials.HOME_ACCESS_PICKER, data=credentials.SWITCH_PAYLOAD)
@@ -39,16 +29,8 @@ def main():
             print('first switch failed')
             sys.exit(1)
 
-        courses, grades = getcoursegrades(r)
-
-        for i, (g, c) in enumerate(zip(grades, courses)):
-            b_grades[c.text] = g.text
-
-        all_grades = '-----Bella-----\r\n'
-        for b in b_grades.keys():
-            all_grades += "{} | {}\r\n".format(b, b_grades[b])
-
-        notif.send_notification(all_grades, notif.kids.oldest)
+        oldest = notif.kids_class(notif.kids.oldest.value, getGrades(r), credentials.SEND_OLDEST_EMAIL)
+        all_grades.append(oldest)
 
         # now let's grab the third kid:
         s.post(credentials.HOME_ACCESS_PICKER, data=credentials.FINAL_SWITCH_PAYLOAD)
@@ -59,23 +41,23 @@ def main():
             print('second switch failed')
             sys.exit(1)
 
-        courses, grades = getcoursegrades(r)
-
-        for i, (g, c) in enumerate(zip(grades, courses)):
-            t_grades[c.text] = g.text
-
-        all_grades = '-----Thomas-----\r\n'
-        for t in t_grades.keys():
-            all_grades += "{} | {}\r\n".format(t, t_grades[t])
-
-        notif.send_notification(all_grades, notif.kids.youngest)
+        youngest = notif.kids_class(notif.kids.youngest.value, getGrades(r), credentials.SEND_YOUNGEST_EMAIL)
+        all_grades.append(youngest)
+        notif.send_text(all_grades)
 
 
-def getcoursegrades(r):
+def getGrades(r):
+    result = dict()
+    all_grades = ""
     soup = BeautifulSoup(r.text, 'html.parser')
     courses = soup.findAll('a', id='courseName')
     grades = soup.findAll('a', id='average')
-    return courses, grades
+
+    for i, (g, c) in enumerate(zip(grades, courses)):
+        result[c.text] = g.text
+    for l in result.keys():
+        all_grades += "{} | {}\r\n".format(l, result[l])
+    return all_grades
 
 
 if __name__ == "__main__":

@@ -4,55 +4,42 @@ import enum
 
 
 class kids(enum.Enum):
-    oldest = 1
-    middle = 2
-    youngest = 3
+    oldest = "-----Bella-----"
+    middle = "-----Luisa-----"
+    youngest = "-----Thomas-----"
 
 
-def send_notification(payload, kids):
+class kids_class:
+    def __init__(self, name, message, email):
+        self.name = name
+        self.message = message
+        self.email = email
+
+    def create_message(self, k, email):
+        return "From: {}\r\nTo: {}\r\nSubject:{}\r\n{}".format(credentials.LOGIN_EMAIL,
+                                                               email,
+                                                               k.name,
+                                                               k.message)
+
+
+def send_text(payload):
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(credentials.LOGIN_EMAIL, credentials.LOGIN_PASS)
-        message = \
-            "From: {}\r\nTo: {}\r\nSubject: \r\n{}".format(credentials.LOGIN_EMAIL,
-                                                           credentials.SEND_SELF_EMAIL,
-                                                           payload)
+        for p in payload:
+            server.sendmail(credentials.LOGIN_EMAIL,
+                            credentials.SEND_SELF_EMAIL,
+                            p.create_message(p, credentials.SEND_SELF_EMAIL))
 
-        server.sendmail(credentials.LOGIN_EMAIL, credentials.SEND_SELF_EMAIL, message)
+            server.sendmail(credentials.LOGIN_EMAIL,
+                            credentials.SEND_WIFE_EMAIL,
+                            p.create_message(p, credentials.SEND_WIFE_EMAIL))
 
-        message = \
-            "From: {}\r\nTo: {}\r\nSubject: \r\n{}".format(credentials.LOGIN_EMAIL,
-                                                           credentials.SEND_WIFE_EMAIL,
-                                                           payload)
-
-        server.sendmail(credentials.LOGIN_EMAIL, credentials.SEND_WIFE_EMAIL, message)
-
-        if kids == kids.oldest:
-            message = \
-                "From: {}\r\nTo: {}\r\nSubject: \r\n{}".format(credentials.LOGIN_EMAIL,
-                                                               credentials.SEND_WIFE_EMAIL,
-                                                               payload)
-
-            server.sendmail(credentials.LOGIN_EMAIL, credentials.SEND_OLDEST_EMAIL, message)
-
-        if kids == kids.middle:
-            message = \
-                "From: {}\r\nTo: {}\r\nSubject: \r\n{}".format(credentials.LOGIN_EMAIL,
-                                                               credentials.SEND_WIFE_EMAIL,
-                                                               payload)
-
-            server.sendmail(credentials.LOGIN_EMAIL, credentials.SEND_MIDDLE_EMAIL, message)
-
-        if kids == kids.youngest:
-            message = \
-                "From: {}\r\nTo: {}\r\nSubject: \r\n{}".format(credentials.LOGIN_EMAIL,
-                                                               credentials.SEND_WIFE_EMAIL,
-                                                               payload)
-
-            server.sendmail(credentials.LOGIN_EMAIL, credentials.SEND_YOUNGEST_EMAIL, message)
+            server.sendmail(credentials.LOGIN_EMAIL,
+                            p.email,
+                            p.create_message(p, p.email))
 
     except Exception as e:
         print(e)
-
 
