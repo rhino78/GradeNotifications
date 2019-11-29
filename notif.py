@@ -8,6 +8,9 @@ class kids(enum.Enum):
     middle = "-----Luisa-----"
     youngest = "-----Thomas-----"
 
+class Error(object):
+    def __init__(self, d):
+        self.instance_dict = d
 
 class kids_class:
     def __init__(self, name, message, email):
@@ -23,6 +26,9 @@ class kids_class:
 
 
 def send_text(payload):
+    # oops, we don't return anything here
+    # how do we retun a result on a list?
+    result = {}
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
@@ -40,6 +46,15 @@ def send_text(payload):
                             p.email,
                             p.create_message(p, p.email))
 
-    except Exception as e:
-        print(e)
+        result = {
+            credentials.LOGIN_EMAIL:
+            (200, "Success")
+        }
+        return (result)
 
+    except Exception as e:
+        result = {
+            credentials.LOGIN_EMAIL:
+            (str(e))
+        }
+        return(result)
