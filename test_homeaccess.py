@@ -2,7 +2,7 @@ import notif
 import unittest
 import credentials
 from mock import patch, call
-import smtplib
+
 
 class TestHomeAccess(unittest.TestCase):
 
@@ -16,7 +16,6 @@ class TestHomeAccess(unittest.TestCase):
                 (200, "Success")
             }
             self.assertEqual(result, error)
-
 
     def test_init(self):
         middle = notif.kids_class("frank", "poop", "nobody@nowhere.com")
@@ -43,6 +42,7 @@ class TestHomeAccess(unittest.TestCase):
         result = instance.notif.send_text(payload)
         self.assertIsInstance(result, dict)
         self.assertEqual(result, error)
+
 
 if __name__ == '__main__':
     unittest.main()

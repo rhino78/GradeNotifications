@@ -3,16 +3,18 @@ import credentials
 import enum
 
 
-class kids(enum.Enum):
+class Kids(enum.Enum):
     oldest = "-----Bella-----"
     middle = "-----Luisa-----"
     youngest = "-----Thomas-----"
+
 
 class Error(object):
     def __init__(self, d):
         self.instance_dict = d
 
-class kids_class:
+
+class KidsClass:
     def __init__(self, name, message, email):
         self.name = name
         self.message = message
