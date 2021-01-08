@@ -58,15 +58,26 @@ def main():
 def getGrades(r):
     result = dict()
     all_grades = ""
+    failcount = 0
     soup = BeautifulSoup(r.text, 'html.parser')
     courses = soup.findAll('a', id='courseName')
     grades = soup.findAll('a', id='average')
 
     for i, (g, c) in enumerate(zip(grades, courses)):
+        if g.text:
+            intgrade = int(g.text.strip())
+            if intgrade < 70:
+                failcount += 1
         result[c.text] = g.text
     for l in result.keys():
         if l not in credentials.DONT_CARE_LIST:
             all_grades += "{} | {}\r\n".format(l, result[l])
+
+    if failcount > 0:
+        all_grades += "--------------------\r\n"         
+        all_grades += "You are failing {} class(es)\r\n".format(failcount)
+        all_grades += "Please report to dad"         
+
     return all_grades
 
 

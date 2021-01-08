@@ -1,6 +1,8 @@
 import smtplib
 import credentials
 import enum
+import requests
+from bs4 import BeautifulSoup
 
 
 class Kids(enum.Enum):
@@ -60,3 +62,17 @@ def send_text(payload):
             (str(e))
         }
         return(result)
+
+def getGrades(r):
+    result = dict()
+    all_grades = ""
+    soup = BeautifulSoup(r.text, 'html.parser')
+    courses = soup.findAll('a', id='courseName')
+    grades = soup.findAll('a', id='average')
+
+    for i, (g, c) in enumerate(zip(grades, courses)):
+        result[c.text] = g.text
+    for l in result.keys():
+        if l not in credentials.DONT_CARE_LIST:
+            all_grades += "{} | {}\r\n".format(l, result[l])
+    return all_grades
