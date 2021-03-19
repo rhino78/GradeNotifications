@@ -1,14 +1,18 @@
+"""
+grade notifications our main class to connect to home access center and
+send the grades to kids and parents
+"""
 import requests
+from bs4 import BeautifulSoup
 import notif
 import credentials
-from bs4 import BeautifulSoup
 
 
 def main():
-
+    """our main to get into home access center"""
     all_grades = []
-    with requests.Session() as s:
-        site = s.get(credentials.HOME_ACCESS_POST)
+    with requests.Session() as session:
+        site = session.get(credentials.HOME_ACCESS_POST)
         bs_content = BeautifulSoup(site.content, "html.parser")
         token = bs_content.find("input", {"name": "__RequestVerificationToken"})["value"]
         login_data = {"__RequestVerificationToken": token,
@@ -17,61 +21,76 @@ def main():
                       "LogOnDetails.Password": credentials.PASSWORD
                       }
 
-        s.post(credentials.HOME_ACCESS_POST, login_data)
-        r = s.get(credentials.HOME_ACCESS_WEEK_VIEW)
+        session.post(credentials.HOME_ACCESS_POST, login_data)
+        response = session.get(credentials.HOME_ACCESS_WEEK_VIEW)
 
-        if r.status_code != 200:
-            print(r.status_code)
-            print(r.reason)
+        if response.status_code != 200:
+            print(response.status_code)
+            print(response.reason)
             print('initial get failed')
             sys.exit(1)
 
-        middle = notif.KidsClass(notif.Kids.middle.value, getGrades(r), credentials.SEND_MIDDLE_EMAIL)
-        all_grades.append(middle)
+        middle = notif.KidsClass(notif.Kids.middle.value,
+                get_grades(response),
+                credentials.SEND_MIDDLE_EMAIL)
+
+        if len(middle.message) > 10:
+            all_grades.append(middle)
 
         # switch kid profile
-        s.post(credentials.HOME_ACCESS_PICKER, data=credentials.SWITCH_PAYLOAD)
-        r = s.get(credentials.HOME_ACCESS_REQUEST)
-        if r.status_code != 200:
-            print(r.status_code)
-            print(r.reason)
+        session.post(credentials.HOME_ACCESS_PICKER, data=credentials.SWITCH_PAYLOAD)
+        response = session.get(credentials.HOME_ACCESS_REQUEST)
+        if response.status_code != 200:
+            print(response.status_code)
+            print(response.reason)
             print('first switch failed')
             sys.exit(1)
 
-        oldest = notif.KidsClass(notif.Kids.oldest.value, getGrades(r), credentials.SEND_OLDEST_EMAIL)
-        all_grades.append(oldest)
+        oldest = notif.KidsClass(notif.Kids.oldest.value,
+                get_grades(response),
+                credentials.SEND_OLDEST_EMAIL)
+
+        if len(oldest.message) > 10:
+            all_grades.append(oldest)
 
         # now let's grab the third kid:
-        s.post(credentials.HOME_ACCESS_PICKER, data=credentials.FINAL_SWITCH_PAYLOAD)
-        r = s.get(credentials.HOME_ACCESS_REQUEST)
-        if r.status_code != 200:
-            print(r.status_code)
-            print(r.reason)
+        session.post(credentials.HOME_ACCESS_PICKER, data=credentials.FINAL_SWITCH_PAYLOAD)
+        response = session.get(credentials.HOME_ACCESS_REQUEST)
+        if response.status_code != 200:
+            print(response.status_code)
+            print(response.reason)
             print('second switch failed')
             sys.exit(1)
 
-        youngest = notif.KidsClass(notif.Kids.youngest.value, getGrades(r), credentials.SEND_YOUNGEST_EMAIL)
-        all_grades.append(youngest)
-        notif.send_text(all_grades)
+        youngest = notif.KidsClass(notif.Kids.youngest.value,
+                get_grades(response),
+                credentials.SEND_YOUNGEST_EMAIL)
+
+        if len(youngest.message) > 10:
+            all_grades.append(youngest)
+
+        if len(all_grades) > 0:
+            notif.send_text(all_grades)
 
 
-def getGrades(r):
+def get_grades(response):
+    """return a useful message from the response"""
     result = dict()
     all_grades = ""
     failcount = 0
-    soup = BeautifulSoup(r.text, 'html.parser')
+    soup = BeautifulSoup(response.text, 'html.parser')
     courses = soup.findAll('a', id='courseName')
     grades = soup.findAll('a', id='average')
 
-    for i, (g, c) in enumerate(zip(grades, courses)):
-        if g.text:
-            intgrade = int(g.text.strip())
+    for _, (grade, course) in enumerate(zip(grades, courses)):
+        if grade.text:
+            intgrade = int(grade.text.strip())
             if intgrade < 70:
                 failcount += 1
-        result[c.text] = g.text
-    for l in result.keys():
-        if l not in credentials.DONT_CARE_LIST:
-            all_grades += "{} | {}\r\n".format(l, result[l])
+        result[course.text] = grade.text
+    for formatted_courses in result:
+        if formatted_courses not in credentials.DONT_CARE_LIST:
+            all_grades += "{} | {}\r\n".format(formatted_courses, result[formatted_courses])
 
     if failcount > 0:
         all_grades += "--------------------\r\n"
@@ -84,4 +103,4 @@ def getGrades(r):
 if __name__ == "__main__":
     import sys
     main()
-    sys.exit()
+    
