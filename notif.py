@@ -14,16 +14,13 @@ class Kids(enum.Enum):
     middle = "-----Luisa-----"
     youngest = "-----Thomas-----"
 
-
 class KidsClass:
     """a class to contain all the kids info """
-    @classmethod
     def __init__(cls, name, message, email):
         cls.name = name
         cls.message = message
         cls.email = email
 
-    @classmethod
     def create_message(cls, k, email):
         """ create the message for the text message"""
         if not k:
@@ -51,7 +48,6 @@ def send_text(payload):
         server.sendmail(credentials.LOGIN_EMAIL,
                         pay.email,
                         pay.create_message(pay, pay.email))
-
     result = {
         credentials.LOGIN_EMAIL:
         (200, "Success")

@@ -34,8 +34,7 @@ def main():
                 get_grades(response),
                 credentials.SEND_MIDDLE_EMAIL)
 
-        if len(middle.message) > 10:
-            all_grades.append(middle)
+        all_grades.append(middle)
 
         # switch kid profile
         session.post(credentials.HOME_ACCESS_PICKER, data=credentials.SWITCH_PAYLOAD)
@@ -50,8 +49,7 @@ def main():
                 get_grades(response),
                 credentials.SEND_OLDEST_EMAIL)
 
-        if len(oldest.message) > 10:
-            all_grades.append(oldest)
+        all_grades.append(oldest)
 
         # now let's grab the third kid:
         session.post(credentials.HOME_ACCESS_PICKER, data=credentials.FINAL_SWITCH_PAYLOAD)
@@ -66,11 +64,8 @@ def main():
                 get_grades(response),
                 credentials.SEND_YOUNGEST_EMAIL)
 
-        if len(youngest.message) > 10:
-            all_grades.append(youngest)
-
-        if len(all_grades) > 0:
-            notif.send_text(all_grades)
+        all_grades.append(youngest)
+        notif.send_text(all_grades)
 
 
 def get_grades(response):
