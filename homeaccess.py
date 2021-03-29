@@ -98,4 +98,3 @@ def get_grades(response):
 if __name__ == "__main__":
     import sys
     main()
-    

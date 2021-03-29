@@ -16,12 +16,12 @@ class Kids(enum.Enum):
 
 class KidsClass:
     """a class to contain all the kids info """
-    def __init__(cls, name, message, email):
-        cls.name = name
-        cls.message = message
-        cls.email = email
+    def __init__(self, name, message, email):
+        self.name = name
+        self.message = message
+        self.email = email
 
-    def create_message(cls, k, email):
+    def create_message(self, k, email):
         """ create the message for the text message"""
         if not k:
             return ""
@@ -53,19 +53,3 @@ def send_text(payload):
         (200, "Success")
     }
     return result
-
-
-def get_grades(response):
-    """ rip through the response to create a useful message """
-    result = dict()
-    all_grades = ""
-    soup = BeautifulSoup(response.text, 'html.parser')
-    courses = soup.findAll('a', id='courseName')
-    grades = soup.findAll('a', id='average')
-
-    for _, (grade, course) in enumerate(zip(grades, courses)):
-        result[course.text] = grade.text
-    for formatted_courses in result:
-        if formatted_courses not in credentials.DONT_CARE_LIST:
-            all_grades += "{} | {}\r\n".format(formatted_courses,result[formatted_courses])
-    return all_grades

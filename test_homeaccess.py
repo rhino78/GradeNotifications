@@ -1,72 +1,12 @@
-import notif
-import json
+"""poop poop poop"""
 import unittest
-import credentials
-import mock
 import requests
-from unittest.mock import MagicMock, Mock, ANY
-from mock import patch, call
-#from bs4 import BeautifulSoup
-#from unittest import mock
+import requests_mock
+from mock import patch
+import homeaccess
+import notif
+import credentials
 
-"""
-class MyGreatClass:
-    def fetch_json(self, url):
-        response = requests.get(url)
-        return response
-
-def mocked_requests_get(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def text(self):
-            return self.json_data.text
-
-    def json(self):
-            return self.json_data
-
-    if args[0] == 'http://someurl.com/test.json':
-        MockResponse.text = [{'average':100,
-        'average':100, 
-        'average':100}]
-        return MockResponse(MockResponse.text, 200)
-    elif args[0] == 'http://someotherurl.com/anothertest.json':
-        return MockResponse({"courseName": "Athletics"}, 200)
-
-    return MockResponse(None, 404)
-
-class TestRequestCall(unittest.TestCase):
-    def _mock_response(
-            self, 
-            status=200,
-            content="CONTENT",
-            json_data=None, 
-            raise_for_status=None):
-        mock_resp = mock.MagicMock()
-        mock_resp.raise_for_status = mock.MagicMock()
-        if raise_for_status:
-            mock_resp.raise_for_status.side_effect = raise_for_status
-        mock_resp.status_code = status
-        mock_resp.content = content
-        if json_data:
-            mock_resp.json = mock.MagicMock(
-                    return_value=json_data)
-        return mock_resp
-
-    @mock.patch('requests.get')
-    def test_response(self, mock_get):
-        mock_resp = self._mock_response(content=test_data)
-        mock_get.return_value = mock_resp
-        mock_resp2 = Mock()
-        mock_resp2.return_value.status_code=200
-        mock_resp2.return_value.text = '{"average": "blah"}'
-        print(mock_resp2.len())
-        print(mock_resp2)
-        result = notif.getGrades(mock_resp2)
-        self.assertEqual(result, "average")
-"""
 class TestHomeAccess(unittest.TestCase):
 
     def test_send_email(self):
@@ -79,6 +19,16 @@ class TestHomeAccess(unittest.TestCase):
                 (200, "Success")
             }
             self.assertEqual(result, error)
+
+    def test_mock(self):
+        """here we want to make sure that the report to dad is in the response"""
+        with requests_mock.Mocker() as m:
+            test_url = "http://test.com"
+            m.get(test_url, text="<a id="'average'">0</a> <a id="'courseName'">test</a>")
+            result = requests.get(test_url)
+            test = homeaccess.get_grades(result)
+            self.assertIn("report to dad", test)
+
 
     def test_init(self):
         middle = notif.KidsClass("frank", "poop", "nobody@nowhere.com")
