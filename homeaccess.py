@@ -91,6 +91,11 @@ def get_grades(response):
         all_grades += "--------------------\r\n"
         all_grades += "You are failing {} class(es)\r\n".format(failcount)
         all_grades += "Please report to dad"
+    else:
+        all_grades += "--------------------\r\n"
+        all_grades += "Your grades are BUSSIN"
+    else:
+
 
     return all_grades
 
