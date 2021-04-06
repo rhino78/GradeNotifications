@@ -94,7 +94,6 @@ def get_grades(response):
     else:
         all_grades += "--------------------\r\n"
         all_grades += "Your grades are BUSSIN"
-    else:
 
 
     return all_grades
