@@ -4,6 +4,7 @@ send the grades to kids and parents
 """
 import requests
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 import notif
 import credentials
 
@@ -90,13 +91,19 @@ def get_grades(response):
     if failcount > 0:
         all_grades += "--------------------\r\n"
         all_grades += "You are failing {} class(es)\r\n".format(failcount)
-        all_grades += "Please report to dad"
+        all_grades += "There are {} days until the end of school".format(get_delta(2021, 5, 27))
     else:
         all_grades += "--------------------\r\n"
         all_grades += "Your grades are BUSSIN"
 
 
     return all_grades
+
+def get_delta(year, month, day):
+    c = datetime.now()
+    b = datetime(year, month, day)
+    a = datetime(c.year, c.month, c.day)
+    return (b - a).days
 
 
 if __name__ == "__main__":

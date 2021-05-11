@@ -21,13 +21,14 @@ class TestHomeAccess(unittest.TestCase):
             self.assertEqual(result, error)
 
     def test_mock(self):
-        """here we want to make sure that the report to dad is in the response"""
+        """here we want to make sure that the special text is in the response """
         with requests_mock.Mocker() as m:
             test_url = "http://test.com"
             m.get(test_url, text="<a id="'average'">0</a> <a id="'courseName'">test</a>")
             result = requests.get(test_url)
             test = homeaccess.get_grades(result)
-            self.assertIn("report to dad", test)
+            print(test)
+            self.assertIn("school", test)
 
 
     def test_init(self):
