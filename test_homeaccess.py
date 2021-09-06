@@ -9,6 +9,10 @@ import credentials
 
 class TestHomeAccess(unittest.TestCase):
 
+    def test_eog(self):
+        test = homeaccess.get_end_of_grading()
+        print(test)
+
     def test_send_email(self):
         with patch("smtplib.SMTP") as mock_smtp:
             payload = []
@@ -24,11 +28,12 @@ class TestHomeAccess(unittest.TestCase):
         """here we want to make sure that the special text is in the response """
         with requests_mock.Mocker() as m:
             test_url = "http://test.com"
-            m.get(test_url, text="<a id="'average'">0</a> <a id="'courseName'">test</a>")
+            m.get(test_url, text=\
+                    "<a id="'average'">0</a> <a id="'courseName'">test subject</a>")
             result = requests.get(test_url)
             test = homeaccess.get_grades(result)
             print(test)
-            self.assertIn("school", test)
+            self.assertIn("grading", test)
 
 
     def test_init(self):

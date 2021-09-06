@@ -4,9 +4,7 @@ create a kids class to create a kid and wire  up the grades
 """
 import smtplib
 import enum
-from bs4 import BeautifulSoup
 import credentials
-
 
 class Kids(enum.Enum):
     """ an enum to hold the kids headers """
@@ -21,7 +19,14 @@ class KidsClass:
         self.message = message
         self.email = email
 
-    def create_message(self, k, email):
+    @staticmethod
+    def delete_message(msg):
+        """delete message"""
+        msg = None
+        return msg
+
+    @staticmethod
+    def create_message(k, email):
         """ create the message for the text message"""
         if not k:
             return ""

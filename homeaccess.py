@@ -2,9 +2,9 @@
 grade notifications our main class to connect to home access center and
 send the grades to kids and parents
 """
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
 import notif
 import credentials
 
@@ -90,8 +90,14 @@ def get_grades(response):
 
     if failcount > 0:
         all_grades += "--------------------\r\n"
-        all_grades += "You are failing {} class(es)\r\n".format(failcount)
-        all_grades += "There are {} days until the end of school".format(get_delta(2021, 5, 27))
+        if failcount ==1 :
+            all_grades += "You are failing {} class\r\n".format(failcount)
+        else:
+            all_grades += "You are failing {} classes\r\n".format(failcount)
+
+        all_grades += \
+                "There are {} days until the end of the grading period\r\n"\
+                .format(get_delta(get_end_of_grading()))
     else:
         all_grades += "--------------------\r\n"
         all_grades += "Your grades are BUSSIN"
@@ -99,12 +105,16 @@ def get_grades(response):
 
     return all_grades
 
-def get_delta(year, month, day):
-    c = datetime.now()
-    b = datetime(year, month, day)
-    a = datetime(c.year, c.month, c.day)
-    return (b - a).days
+def get_end_of_grading():
+    """get the current grading periiod end date"""
+    for g_grades in credentials.GRADING_PERIOD:
+        if datetime.now() < g_grades:
+            return g_grades
+    return None
 
+def get_delta(d_date):
+    """returns the difference in days between today and d_date"""
+    return (d_date - datetime.now()).days
 
 if __name__ == "__main__":
     import sys
