@@ -8,9 +8,9 @@ import credentials
 
 class Kids(enum.Enum):
     """ an enum to hold the kids headers """
-    oldest = "-----Bella-----"
-    middle = "-----Luisa-----"
-    youngest = "-----Thomas-----"
+    oldest = "-----Bella-----\r\n"
+    middle = "-----Luisa-----\r\n"
+    youngest = "-----Thomas-----\r\n"
 
 class KidsClass:
     """a class to contain all the kids info """

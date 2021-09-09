@@ -1,17 +1,17 @@
-"""poop poop poop"""
+"""our fancy unit testing suite"""
 import unittest
 import requests
 import requests_mock
 from mock import patch
-import homeaccess
 import notif
 import credentials
+import message
 
 class TestHomeAccess(unittest.TestCase):
 
     def test_eog(self):
-        test = homeaccess.get_end_of_grading()
-        print(test)
+        test = message.get_end_of_grading()
+        print("the end of the grading would be: {}\r\n".format(test))
 
     def test_send_email(self):
         with patch("smtplib.SMTP") as mock_smtp:
@@ -24,16 +24,27 @@ class TestHomeAccess(unittest.TestCase):
             }
             self.assertEqual(result, error)
 
-    def test_mock(self):
-        """here we want to make sure that the special text is in the response """
+    def test_message_fail_result(self):
+        """here we want to make sure that the special text is in fail the response """
         with requests_mock.Mocker() as m:
             test_url = "http://test.com"
             m.get(test_url, text=\
                     "<a id="'average'">0</a> <a id="'courseName'">test subject</a>")
             result = requests.get(test_url)
-            test = homeaccess.get_grades(result)
+            test = message.get_grades(result)
             print(test)
-            self.assertIn("grading", test)
+            self.assertIn("failing", test)
+
+    def test_message_pass_result(self):
+        """here we want to make sure that the special text is in pass the response """
+        with requests_mock.Mocker() as m:
+            test_url = "http://test.com"
+            m.get(test_url, text=\
+                    "<a id="'average'">100</a> <a id="'courseName'">test subject</a>")
+            result = requests.get(test_url)
+            test = message.get_grades(result)
+            print(notif.Kids.oldest.value + test)
+            self.assertIn("grades", test)
 
 
     def test_init(self):
