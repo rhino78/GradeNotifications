@@ -29,7 +29,8 @@ class TestHomeAccess(unittest.TestCase):
         with requests_mock.Mocker() as m:
             test_url = "http://test.com"
             m.get(test_url, text=\
-                    "<a id="'average'">0</a> <a id="'courseName'">test subject</a>")
+                    "<a id="'average'">0</a> <a id="'courseName'">test subject</a>\
+                    <a id="'average'">0</a> <a id="'courseName'">test subject2</a>")
             result = requests.get(test_url)
             test = message.get_grades(result)
             print(test)
@@ -40,7 +41,8 @@ class TestHomeAccess(unittest.TestCase):
         with requests_mock.Mocker() as m:
             test_url = "http://test.com"
             m.get(test_url, text=\
-                    "<a id="'average'">100</a> <a id="'courseName'">test subject</a>")
+                    "<a id="'average'">100</a> <a id="'courseName'">test subject</a>"\
+                    "<a id="'average'">P</a> <a id="'courseName'">test subject2</a>")
             result = requests.get(test_url)
             test = message.get_grades(result)
             print(notif.Kids.oldest.value + test)

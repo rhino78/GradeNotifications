@@ -15,7 +15,14 @@ def get_grades(response):
 
     for _, (grade, course) in enumerate(zip(grades, courses)):
         if grade.text:
-            intgrade = int(grade.text.strip())
+            print(grade.text)
+            #in one case we had a 'P' for passing
+            #we need to account for that
+            if 'P' in grade.text:
+                intgrade = 100
+            else:
+                intgrade = int(grade.text.strip())
+
             if intgrade < 70:
                 failcount += 1
         result[course.text] = grade.text
