@@ -15,7 +15,6 @@ def get_grades(response):
 
     for _, (grade, course) in enumerate(zip(grades, courses)):
         if grade.text:
-            print(grade.text)
             #in one case we had a 'P' for passing
             #we need to account for that
             if 'P' in grade.text:
