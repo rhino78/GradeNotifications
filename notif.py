@@ -2,22 +2,24 @@
 this module does all the heavy lifting to the text messages
 create a kids class to create a kid and wire  up the grades
 """
-import smtplib
 import enum
 import credentials
+from twilio.rest import Client
+
 
 class Kids(enum.Enum):
     """ an enum to hold the kids headers """
-    oldest = "-----Bella-----\r\n"
     middle = "-----Luisa-----\r\n"
     youngest = "-----Thomas-----\r\n"
 
+
 class KidsClass:
     """a class to contain all the kids info """
-    def __init__(self, name, message, email):
+
+    def __init__(self, name, message, phone):
         self.name = name
         self.message = message
-        self.email = email
+        self.phone = phone
 
     @staticmethod
     def delete_message(msg):
@@ -26,35 +28,33 @@ class KidsClass:
         return msg
 
     @staticmethod
-    def create_message(k, email):
+    def create_message(k, phone):
         """ create the message for the text message"""
         if not k:
             return ""
-        return "From: {}\r\nTo: {}\r\nSubject:{}\r\n{}".format(credentials.LOGIN_EMAIL,
-                                                               email,
-                                                               k.name,
-                                                               k.message)
+        return "{}{}".format(k.name, k.message)
 
-def send_text(payload):
+
+def send_twilio(payload):
     """ sending the acutal text to the phone """
-    result = {}
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-    server.login(credentials.LOGIN_EMAIL, credentials.LOGIN_PASS)
+    account_sid = credentials.ACCOUNT_SID
+    auth_token = credentials.AUTH_TOKEN
+    client = Client(account_sid, auth_token)
     for pay in payload:
-        server.sendmail(credentials.LOGIN_EMAIL,
-                        credentials.SEND_SELF_EMAIL,
-                        pay.create_message(pay, credentials.SEND_SELF_EMAIL))
+        client.messages.create(to=credentials.SEND_SELF_TEXT,
+                               from_=credentials.TWILIO_PHONE,
+                               body=pay.create_message(pay, credentials.SEND_SELF_TEXT))
 
-        server.sendmail(credentials.LOGIN_EMAIL,
-                        credentials.SEND_WIFE_EMAIL,
-                        pay.create_message(pay, credentials.SEND_WIFE_EMAIL))
+        client.messages.create(to=credentials.SEND_WIFE_TEXT,
+                               from_=credentials.TWILIO_PHONE,
+                               body=pay.create_message(pay, credentials.SEND_WIFE_TEXT))
 
-        server.sendmail(credentials.LOGIN_EMAIL,
-                        pay.email,
-                        pay.create_message(pay, pay.email))
-    result = {
-        credentials.LOGIN_EMAIL:
-        (200, "Success")
-    }
-    return result
+        client.messages.create(to=pay.phone,
+                               from_=credentials.TWILIO_PHONE,
+                               body=pay.create_message(pay, pay.phone))
+
+
+def print_only(payload):
+    """a method to print the message text for testing"""
+    for p in payload:
+        print(p.create_message(p, p.phone))

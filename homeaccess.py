@@ -15,7 +15,10 @@ def main():
     with requests.Session() as session:
         site = session.get(credentials.HOME_ACCESS_POST)
         bs_content = BeautifulSoup(site.content, "html.parser")
-        token = bs_content.find("input", {"name": "__RequestVerificationToken"})["value"]
+
+        token = bs_content.find(
+            "input", {"name": "__RequestVerificationToken"}).get('value')
+
         login_data = {"__RequestVerificationToken": token,
                       "Database": 10,
                       "LogOnDetails.UserName": credentials.USERNAME,
@@ -32,29 +35,16 @@ def main():
             sys.exit(1)
 
         middle = notif.KidsClass(notif.Kids.middle.value,
-                message.get_grades(response),
-                credentials.SEND_MIDDLE_EMAIL)
+                                 message.get_grades(response),
+                                 credentials.SEND_MIDDLE_TEXT)
 
         all_grades.append(middle)
 
         # switch kid profile
-        session.post(credentials.HOME_ACCESS_PICKER, data=credentials.SWITCH_PAYLOAD)
+        session.post(credentials.HOME_ACCESS_PICKER,
+                     data=credentials.FINAL_SWITCH_PAYLOAD)
         response = session.get(credentials.HOME_ACCESS_REQUEST)
-        if response.status_code != 200:
-            print(response.status_code)
-            print(response.reason)
-            print('first switch failed')
-            sys.exit(1)
 
-        oldest = notif.KidsClass(notif.Kids.oldest.value,
-                message.get_grades(response),
-                credentials.SEND_OLDEST_EMAIL)
-
-        all_grades.append(oldest)
-
-        # now let's grab the third kid:
-        session.post(credentials.HOME_ACCESS_PICKER, data=credentials.FINAL_SWITCH_PAYLOAD)
-        response = session.get(credentials.HOME_ACCESS_REQUEST)
         if response.status_code != 200:
             print(response.status_code)
             print(response.reason)
@@ -62,11 +52,11 @@ def main():
             sys.exit(1)
 
         youngest = notif.KidsClass(notif.Kids.youngest.value,
-                message.get_grades(response),
-                credentials.SEND_YOUNGEST_EMAIL)
+                                   message.get_grades(response),
+                                   credentials.SEND_YOUNGEST_TEXT)
 
         all_grades.append(youngest)
-        notif.send_text(all_grades)
+        notif.send_twilio(all_grades)
 
 
 if __name__ == "__main__":
