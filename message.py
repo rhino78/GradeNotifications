@@ -25,13 +25,15 @@ def get_grades(response):
 
             if intgrade < 70:
                 failcount += 1
-        result[course.text] = grade.text
+
+        if len(grade.text) > 0:
+            result[course.text] = grade.text
     for formatted_courses in result:
         if formatted_courses not in credentials.DONT_CARE_LIST:
             all_grades += "{} | {}\r\n".format(formatted_courses,
                                                result[formatted_courses])
 
-    if failcount > 0:
+    if len(result) > 0 and failcount > 0:
         all_grades += "--------------------\r\n"
         if failcount == 1:
             all_grades += "You are failing {} class\r\n".format(failcount)
@@ -41,7 +43,7 @@ def get_grades(response):
         all_grades += \
             "There are {} days until the end of the grading period\r\n"\
             .format(get_delta(get_end_of_grading()))
-    else:
+    elif len(result) > 0:
         all_grades += "--------------------\r\n"
         all_grades += "Your grades are {}".format(get_rand_compliment())
 
