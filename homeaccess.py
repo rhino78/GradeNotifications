@@ -38,7 +38,8 @@ def main():
                                  message.get_grades(response),
                                  credentials.SEND_MIDDLE_TEXT)
 
-        all_grades.append(middle)
+        if len(middle.message) > 0:
+            all_grades.append(middle)
 
         # switch kid profile
         session.post(credentials.HOME_ACCESS_PICKER,
@@ -55,8 +56,13 @@ def main():
                                    message.get_grades(response),
                                    credentials.SEND_YOUNGEST_TEXT)
 
-        all_grades.append(youngest)
-        notif.send_twilio(all_grades)
+        if len(youngest.message) > 0:
+            all_grades.append(youngest)
+
+        #adding in a safeguard to prevent periods where there are no grades
+        #not to send a message
+        if len(all_grades) > 0:
+            notif.send_twilio(all_grades)
 
 
 if __name__ == "__main__":

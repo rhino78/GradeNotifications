@@ -43,7 +43,6 @@ class TestHomeAccess(unittest.TestCase):
                     <a id="'average'">0</a> <a id="'courseName'">test subject2</a>")
             result = requests.get(test_url)
             test = message.get_grades(result)
-            print(test)
             self.assertIn("failing", test)
 
     def test_message_pass_result(self):
@@ -56,6 +55,32 @@ class TestHomeAccess(unittest.TestCase):
             test = message.get_grades(result)
             print(notif.Kids.youngest.value + test)
             self.assertIn("grades", test)
+
+    def test_none(self):
+        test_list = []
+        with requests_mock.Mocker() as m:
+            test_url = "http://test.com"
+            m.get(test_url, text="<a id="'average'"></a> <a id="'courseName'">test subject</a>"
+                  "<a id="'average'"></a> <a id="'courseName'">test subject2</a>")
+            result = requests.get(test_url)
+            test = message.get_grades(result)
+
+            response = requests.get(test_url)
+            middle = notif.KidsClass(notif.Kids.middle.value,
+                                     message.get_grades(response),
+                                     credentials.SEND_MIDDLE_TEXT)
+
+            if len(middle.message) > 0:
+                test_list.append(middle)
+
+            #print(f'the length of the list is: {len(test_list)}')
+            #print(f'the message from the class is: "{middle.message}"')
+            #print(f'the length from the class is: {len(middle.message)}')
+            #print(f'the middle value: {notif.Kids.middle.value} the test value: {test}')
+
+            #just need to handle these days where there are no grades
+            #self.assertIsNone(test)
+            self.assertLessEqual(len(test), 0)
 
     def test_init(self):
         middle = notif.KidsClass("frank", "poop", "nobody@nowhere.com")

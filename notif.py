@@ -22,12 +22,6 @@ class KidsClass:
         self.phone = phone
 
     @staticmethod
-    def delete_message(msg):
-        """delete message"""
-        msg = None
-        return msg
-
-    @staticmethod
     def create_message(k, phone):
         """ create the message for the text message"""
         if not k:
