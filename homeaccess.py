@@ -6,14 +6,14 @@ import requests
 from bs4 import BeautifulSoup
 import message
 import notif
-import credentials
+import ryancreds
 
 
 def main():
     """our main to get into home access center"""
     all_grades = []
     with requests.Session() as session:
-        site = session.get(credentials.HOME_ACCESS_POST)
+        site = session.get(ryancreds.HOME_ACCESS_POST)
         bs_content = BeautifulSoup(site.content, "html.parser")
 
         token = bs_content.find(
@@ -21,12 +21,12 @@ def main():
 
         login_data = {"__RequestVerificationToken": token,
                       "Database": 10,
-                      "LogOnDetails.UserName": credentials.USERNAME,
-                      "LogOnDetails.Password": credentials.PASSWORD
+                      "LogOnDetails.UserName": ryancreds.USERNAME,
+                      "LogOnDetails.Password": ryancreds.PASSWORD
                       }
 
-        session.post(credentials.HOME_ACCESS_POST, login_data)
-        response = session.get(credentials.HOME_ACCESS_WEEK_VIEW)
+        session.post(ryancreds.HOME_ACCESS_POST, login_data)
+        response = session.get(ryancreds.HOME_ACCESS_WEEK_VIEW)
 
         if response.status_code != 200:
             print(response.status_code)
@@ -36,15 +36,15 @@ def main():
 
         middle = notif.KidsClass(notif.Kids.middle.value,
                                  message.get_grades(response),
-                                 credentials.SEND_MIDDLE_TEXT)
+                                 ryancreds.SEND_MIDDLE_TEXT)
 
         if len(middle.message) > 0:
             all_grades.append(middle)
 
         # switch kid profile
-        session.post(credentials.HOME_ACCESS_PICKER,
-                     data=credentials.FINAL_SWITCH_PAYLOAD)
-        response = session.get(credentials.HOME_ACCESS_REQUEST)
+        session.post(ryancreds.HOME_ACCESS_PICKER,
+                     data=ryancreds.FINAL_SWITCH_PAYLOAD)
+        response = session.get(ryancreds.HOME_ACCESS_REQUEST)
 
         if response.status_code != 200:
             print(response.status_code)
@@ -54,7 +54,7 @@ def main():
 
         youngest = notif.KidsClass(notif.Kids.youngest.value,
                                    message.get_grades(response),
-                                   credentials.SEND_YOUNGEST_TEXT)
+                                   ryancreds.SEND_YOUNGEST_TEXT)
 
         if len(youngest.message) > 0:
             all_grades.append(youngest)

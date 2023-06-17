@@ -3,7 +3,7 @@ this module does all the heavy lifting to the text messages
 create a kids class to create a kid and wire  up the grades
 """
 import enum
-import credentials
+import ryancreds
 from twilio.rest import Client
 
 
@@ -31,20 +31,20 @@ class KidsClass:
 
 def send_twilio(payload):
     """ sending the acutal text to the phone """
-    account_sid = credentials.ACCOUNT_SID
-    auth_token = credentials.AUTH_TOKEN
+    account_sid = ryancreds.ACCOUNT_SID
+    auth_token = ryancreds.AUTH_TOKEN
     client = Client(account_sid, auth_token)
     for pay in payload:
-        client.messages.create(to=credentials.SEND_SELF_TEXT,
-                               from_=credentials.TWILIO_PHONE,
-                               body=pay.create_message(pay, credentials.SEND_SELF_TEXT))
+        client.messages.create(to=ryancreds.SEND_SELF_TEXT,
+                               from_=ryancreds.TWILIO_PHONE,
+                               body=pay.create_message(pay, ryancreds.SEND_SELF_TEXT))
 
-        client.messages.create(to=credentials.SEND_WIFE_TEXT,
-                               from_=credentials.TWILIO_PHONE,
-                               body=pay.create_message(pay, credentials.SEND_WIFE_TEXT))
+        client.messages.create(to=ryancreds.SEND_WIFE_TEXT,
+                               from_=ryancreds.TWILIO_PHONE,
+                               body=pay.create_message(pay, ryancreds.SEND_WIFE_TEXT))
 
         client.messages.create(to=pay.phone,
-                               from_=credentials.TWILIO_PHONE,
+                               from_=ryancreds.TWILIO_PHONE,
                                body=pay.create_message(pay, pay.phone))
 
 

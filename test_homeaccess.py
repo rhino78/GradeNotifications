@@ -7,7 +7,7 @@ import requests_mock
 
 import message
 import notif
-import credentials
+import ryancreds
 
 
 class TestHomeAccess(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestHomeAccess(unittest.TestCase):
             response = requests.get(test_url)
             middle = notif.KidsClass(notif.Kids.middle.value,
                                      message.get_grades(response),
-                                     credentials.SEND_MIDDLE_TEXT)
+                                     ryancreds.SEND_MIDDLE_TEXT)
 
             test_list.append(middle)
 
@@ -68,7 +68,7 @@ class TestHomeAccess(unittest.TestCase):
             response = requests.get(test_url)
             middle = notif.KidsClass(notif.Kids.middle.value,
                                      message.get_grades(response),
-                                     credentials.SEND_MIDDLE_TEXT)
+                                     ryancreds.SEND_MIDDLE_TEXT)
 
             if len(middle.message) > 0:
                 test_list.append(middle)

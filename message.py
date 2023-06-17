@@ -2,7 +2,7 @@
 from datetime import datetime
 import random
 from bs4 import BeautifulSoup
-import credentials
+import ryancreds
 
 
 def get_grades(response):
@@ -29,7 +29,7 @@ def get_grades(response):
         if len(grade.text) > 0:
             result[course.text] = grade.text
     for formatted_courses in result:
-        if formatted_courses not in credentials.DONT_CARE_LIST:
+        if formatted_courses not in ryancreds.DONT_CARE_LIST:
             all_grades += "{} | {}\r\n".format(formatted_courses,
                                                result[formatted_courses])
 
@@ -52,12 +52,12 @@ def get_grades(response):
 
 def get_rand_compliment():
     """get a random compliment for the kiddo"""
-    return credentials.COMPLIMENTS[random.randint(0, len(credentials.COMPLIMENTS)-1)]
+    return ryancreds.COMPLIMENTS[random.randint(0, len(ryancreds.COMPLIMENTS)-1)]
 
 
 def get_end_of_grading():
     """get the current grading period end date"""
-    for g_grades in credentials.GRADING_PERIOD:
+    for g_grades in ryancreds.GRADING_PERIOD:
         if datetime.now() < g_grades:
             return g_grades
     return None
